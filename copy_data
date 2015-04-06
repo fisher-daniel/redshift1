@@ -1,0 +1,28 @@
+#!/bin/bash
+DBHOST="bi-ubi.cw0ltvwkwu3t.us-east-1.redshift.amazonaws.com"
+DBPORT="5439"
+DBNAME="biubi"
+DBTABLE="rs.t_trips"
+DBUSER="root"
+DBPASS="5tekapU3"
+S3PATH="s3://himex-up-bigdata/pdi/trips/v_trips" 
+YESTERDAY=`date -d "yesterday" +"%Y-%m-%d"`
+AWS_ACCESS_KEY_ID="x"
+AWS_SECRET_ACCESS_KEY="x"
+
+# Secure temp files
+export PGPASSFILE=`mktemp /tmp/pass.XXXXXX`
+cmds=`mktemp /tmp/cmds.XXXXXX`
+
+
+logs=`mktemp /tmp/logs.XXXXXX`
+
+cat >$PGPASSFILE << EOF
+$DBHOST:$DBPORT:$DBNAME:$DBUSER:$DBPASS
+EOF
+
+cat > $cmds << EOF
+copy $DBTABLE from '$CF_LOG_PREFIX' CREDENTIALS 'aws_access_key_id=$AWS_ACCESS_KEY_ID;aws_secret_access_key=$AWS_SECRET_ACCESS_KEY' delimiter '\t' MAXERROR 200 IGNOREHEADER 2 gzip;
+EOF
+
+psql -d $DBNAME -h $DBHOST -p $DBPORT -U $DBUSER -f $cmds >$logs 2>&1
