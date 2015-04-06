@@ -1,0 +1,7 @@
+/* unload data from a select to a csv file on S3 */
+unload ('select * from rs.a5') to 
+'s3://himex-up-bigdata/rs_exports/trips.csv' credentials 'aws_access_key_3 order by trip_id asc') 
+to 's3://himex-up-bigdata/rs_exports/exp' 
+credentials 'aws_access_key_id=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+aws_secret_access_key=xxxxxxxxxxxxxxxx' 
+delimiter',' ALLOWOVERWRITE parallel off gzip;
